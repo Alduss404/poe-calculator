@@ -213,6 +213,16 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {Object.keys(items).map(renderCard)}
         </div>
+
+        <footer className="text-center text-xs text-gray-600 pb-4 space-y-1">
+          <p>
+            Data provided by{' '}
+            <a href="https://poe.ninja" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-400 underline underline-offset-2 transition-colors">
+              poe.ninja
+            </a>
+          </p>
+          <p>Prices are indicative and may slightly differ from the live in-game trade market. :P</p>
+        </footer>
       </div>
     </div>
   );
