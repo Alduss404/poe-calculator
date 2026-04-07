@@ -17,10 +17,8 @@ export default function App() {
   const fetchLivePrices = async () => {
     setIsFetching(true);
     try {
-      const targetUrl = `https://poe.ninja/api/data/currencyoverview?league=${LEAGUE}&type=Currency`;
-      const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
-      const res = await fetch(proxyUrl);
-      if (!res.ok) throw new Error(`Network response was not ok: ${res.status}`);
+      const res = await fetch(`/api/prices?league=${encodeURIComponent(LEAGUE)}`);
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
       const data = await res.json();
 
       const find = (name) => {
