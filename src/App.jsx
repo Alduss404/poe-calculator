@@ -8,10 +8,10 @@ export default function App() {
   const [isFetching, setIsFetching] = useState(false);
 
   const [items, setItems] = useState({
-    vivid: { name: 'Vivid (Yellow)', color: 'text-yellow-400', border: 'border-yellow-500/50', bg: 'bg-yellow-500/10', amount: 0, cQty: 5000, cPrice: 100, dQty: 9000, dPrice: 1 },
-    wild: { name: 'Wild (Purple)', color: 'text-purple-400', border: 'border-purple-500/50', bg: 'bg-purple-500/10', amount: 0, cQty: 5000, cPrice: 100, dQty: 11000, dPrice: 1 },
-    primal: { name: 'Primal (Blue)', color: 'text-blue-400', border: 'border-blue-500/50', bg: 'bg-blue-500/10', amount: 0, cQty: 5000, cPrice: 100, dQty: 10500, dPrice: 1 },
-    stackedDeck: { name: 'Stacked Decks', color: 'text-amber-500', border: 'border-amber-500/50', bg: 'bg-amber-500/10', amount: 0, cQty: 85, cPrice: 100, dQty: 200, dPrice: 1 },
+    vivid: { name: 'Vivid (Yellow)', color: 'text-yellow-400', border: 'border-yellow-500/50', bg: 'bg-yellow-500/10', amount: 0, cQty: 0, cPrice: 100, dQty: 0, dPrice: 1 },
+    wild: { name: 'Wild (Purple)', color: 'text-purple-400', border: 'border-purple-500/50', bg: 'bg-purple-500/10', amount: 0, cQty: 0, cPrice: 100, dQty: 0, dPrice: 1 },
+    primal: { name: 'Primal (Blue)', color: 'text-blue-400', border: 'border-blue-500/50', bg: 'bg-blue-500/10', amount: 0, cQty: 0, cPrice: 100, dQty: 0, dPrice: 1 },
+    stackedDeck: { name: 'Stacked Decks', color: 'text-amber-500', border: 'border-amber-500/50', bg: 'bg-amber-500/10', amount: 0, cQty: 0, cPrice: 100, dQty: 0, dPrice: 1 },
   });
 
   const fetchLivePrices = async () => {
