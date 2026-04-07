@@ -177,9 +177,9 @@ export default function App() {
           <div>
             <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-yellow-400 to-amber-500 flex items-center gap-3">
               <Calculator className="text-gray-100" />
-              Trade Router
+              Chaos or Divines?
             </h1>
-            <p className="text-gray-400 mt-2">Find the most profitable way to liquidate your items.</p>
+            <p className="text-gray-400 mt-2">Helps you decide whether to sell for Chaos or Divines.</p>
           </div>
 
           <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col sm:flex-row items-start sm:items-center gap-3">
