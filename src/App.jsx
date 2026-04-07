@@ -18,11 +18,10 @@ export default function App() {
     setIsFetching(true);
     try {
       const targetUrl = `https://poe.ninja/api/data/currencyoverview?league=${LEAGUE}&type=Currency`;
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+      const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
       const res = await fetch(proxyUrl);
       if (!res.ok) throw new Error(`Network response was not ok: ${res.status}`);
-      const response = await res.json();
-      const data = JSON.parse(response.contents);
+      const data = await res.json();
 
       const find = (name) => {
         const entry = data.lines.find((item) => item.currencyTypeName === name);
