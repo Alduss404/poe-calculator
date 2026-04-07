@@ -1,15 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, RefreshCw, Calculator, TrendingUp } from 'lucide-react';
+
+const LEAGUE = 'Mirage';
 
 export default function App() {
   const [divToChaos, setDivToChaos] = useState(230);
+  const [isFetching, setIsFetching] = useState(false);
 
   const [items, setItems] = useState({
-    vivid: { name: 'Vivid (Yellow)', color: 'text-yellow-400', border: 'border-yellow-500/50', bg: 'bg-yellow-500/10', amount: 25000, cQty: 5000, cPrice: 130, dQty: 9000, dPrice: 1 },
-    wild: { name: 'Wild (Purple)', color: 'text-purple-400', border: 'border-purple-500/50', bg: 'bg-purple-500/10', amount: 15000, cQty: 5000, cPrice: 100, dQty: 11000, dPrice: 1 },
-    primal: { name: 'Primal (Blue)', color: 'text-blue-400', border: 'border-blue-500/50', bg: 'bg-blue-500/10', amount: 12000, cQty: 5000, cPrice: 110, dQty: 10500, dPrice: 1 },
-    stackedDeck: { name: 'Stacked Decks', color: 'text-amber-500', border: 'border-amber-500/50', bg: 'bg-amber-500/10', amount: 500, cQty: 85, cPrice: 100, dQty: 200, dPrice: 1 },
+    vivid: { name: 'Vivid (Yellow)', color: 'text-yellow-400', border: 'border-yellow-500/50', bg: 'bg-yellow-500/10', amount: 0, cQty: 5000, cPrice: 100, dQty: 9000, dPrice: 1 },
+    wild: { name: 'Wild (Purple)', color: 'text-purple-400', border: 'border-purple-500/50', bg: 'bg-purple-500/10', amount: 0, cQty: 5000, cPrice: 100, dQty: 11000, dPrice: 1 },
+    primal: { name: 'Primal (Blue)', color: 'text-blue-400', border: 'border-blue-500/50', bg: 'bg-blue-500/10', amount: 0, cQty: 5000, cPrice: 100, dQty: 10500, dPrice: 1 },
+    stackedDeck: { name: 'Stacked Decks', color: 'text-amber-500', border: 'border-amber-500/50', bg: 'bg-amber-500/10', amount: 0, cQty: 85, cPrice: 100, dQty: 200, dPrice: 1 },
   });
+
+  const fetchLivePrices = async () => {
+    setIsFetching(true);
+    try {
+      const targetUrl = `https://poe.ninja/api/data/currencyoverview?league=${LEAGUE}&type=Currency`;
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+      const res = await fetch(proxyUrl);
+      if (!res.ok) throw new Error(`Network response was not ok: ${res.status}`);
+      const response = await res.json();
+      const data = JSON.parse(response.contents);
+
+      const find = (name) => {
+        const entry = data.lines.find((item) => item.currencyTypeName === name);
+        if (!entry) throw new Error(`"${name}" not found in API response.`);
+        return entry.chaosEquivalent;
+      };
+
+      const divineCE = find('Divine Orb');
+      setDivToChaos(Math.round(divineCE));
+
+      const lifeforceMap = {
+        vivid: 'Vivid Crystallised Lifeforce',
+        wild: 'Wild Crystallised Lifeforce',
+        primal: 'Primal Crystallised Lifeforce',
+        stackedDeck: 'Stacked Deck',
+      };
+
+      setItems((prev) => {
+        const next = { ...prev };
+        for (const [key, apiName] of Object.entries(lifeforceMap)) {
+          const ce = find(apiName);
+          next[key] = {
+            ...prev[key],
+            cPrice: 100,
+            cQty: Math.round(100 / ce),
+            dPrice: 1,
+            dQty: Math.round(divineCE / ce),
+          };
+        }
+        return next;
+      });
+    } catch (err) {
+      console.error('Failed to fetch live prices:', err);
+      alert(`Could not fetch live prices: ${err.message}`);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLivePrices();
+  }, []);
 
   const handleUpdate = (type, field, value) => {
     const numValue = parseFloat(value) || 0;
@@ -130,7 +185,7 @@ export default function App() {
             <p className="text-gray-400 mt-2">Find the most profitable way to liquidate your items.</p>
           </div>
 
-          <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center gap-4">
+          <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <div className="text-sm font-medium text-gray-400 uppercase tracking-wide">Economy</div>
             <div className="flex items-center gap-2">
               <span className="text-white font-bold">1 D</span>
@@ -143,20 +198,24 @@ export default function App() {
               />
               <span className="text-yellow-500 font-bold">C</span>
             </div>
+            <button
+              onClick={fetchLivePrices}
+              disabled={isFetching}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200
+                bg-purple-600 hover:bg-purple-500 text-white
+                disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed
+                border border-purple-500/50 disabled:border-gray-600/50
+                shadow-[0_0_10px_rgba(168,85,247,0.3)] disabled:shadow-none"
+            >
+              <RefreshCw size={14} className={isFetching ? 'animate-spin' : ''} />
+              {isFetching ? 'Syncing...' : 'Sync Live Prices'}
+            </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {Object.keys(items).map(renderCard)}
         </div>
-
-        <div className="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-xl text-center">
-          <div className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-2">Total Optimal Yield</div>
-          <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-amber-400">
-            {totalOptimalDivines.toFixed(2)} D
-          </div>
-        </div>
-
       </div>
     </div>
   );
