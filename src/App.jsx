@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, RefreshCw, Calculator, TrendingUp } from 'lucide-react';
 
-const LEAGUE = 'Curse of the Allflame';
-
 export default function App() {
   const [divToChaos, setDivToChaos] = useState(230);
   const [isFetching, setIsFetching] = useState(false);
@@ -19,14 +17,21 @@ export default function App() {
     setIsFetching(true);
     setPriceError('');
     try {
-      const res = await fetch(`/api/prices?league=${encodeURIComponent(LEAGUE)}`);
+      const res = await fetch('/api/prices');
       if (!res.ok) throw new Error(`API returned ${res.status}`);
       const data = await res.json();
 
       const find = (name) => {
-        const entry = data.lines.find((item) => item.currencyTypeName === name);
-        if (!entry) throw new Error(`"${name}" not found in API response.`);
-        return entry.chaosEquivalent;
+        const item = data.items?.find((candidate) => candidate.name === name);
+        const entry = data.lines?.find((candidate) => candidate.id === item?.id);
+        const chaosItem = data.items?.find((candidate) => candidate.name === 'Chaos Orb');
+        const chaosEntry = data.lines?.find((candidate) => candidate.id === chaosItem?.id);
+
+        if (!entry || !chaosEntry?.primaryValue) {
+          throw new Error(`"${name}" not found in API response.`);
+        }
+
+        return entry.primaryValue / chaosEntry.primaryValue;
       };
 
       const divineCE = find('Divine Orb');
