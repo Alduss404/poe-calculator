@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const league = req.query.league || 'Settlers';
+  const league = req.query.league || 'Curse of the Allflame';
   const url = `https://poe.ninja/api/data/currencyoverview?league=${encodeURIComponent(league)}&type=Currency`;
 
   try {

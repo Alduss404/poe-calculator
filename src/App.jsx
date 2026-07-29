@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, RefreshCw, Calculator, TrendingUp } from 'lucide-react';
 
-const LEAGUE = 'Mirage';
+const LEAGUE = 'Curse of the Allflame';
 
 export default function App() {
   const [divToChaos, setDivToChaos] = useState(230);
   const [isFetching, setIsFetching] = useState(false);
+  const [priceError, setPriceError] = useState('');
 
   const [items, setItems] = useState({
     vivid: { name: 'Vivid (Yellow)', color: 'text-yellow-400', border: 'border-yellow-500/50', bg: 'bg-yellow-500/10', amount: 0, cQty: 0, cPrice: 100, dQty: 0, dPrice: 1 },
@@ -16,6 +17,7 @@ export default function App() {
 
   const fetchLivePrices = async () => {
     setIsFetching(true);
+    setPriceError('');
     try {
       const res = await fetch(`/api/prices?league=${encodeURIComponent(LEAGUE)}`);
       if (!res.ok) throw new Error(`API returned ${res.status}`);
@@ -53,7 +55,7 @@ export default function App() {
       });
     } catch (err) {
       console.error('Failed to fetch live prices:', err);
-      alert(`Could not fetch live prices: ${err.message}`);
+      setPriceError(`Could not fetch live prices: ${err.message}`);
     } finally {
       setIsFetching(false);
     }
@@ -62,6 +64,13 @@ export default function App() {
   useEffect(() => {
     fetchLivePrices();
   }, []);
+
+  useEffect(() => {
+    if (!priceError) return undefined;
+
+    const timeout = setTimeout(() => setPriceError(''), 30_000);
+    return () => clearTimeout(timeout);
+  }, [priceError]);
 
   const handleUpdate = (type, field, value) => {
     const numValue = parseFloat(value) || 0;
@@ -224,6 +233,17 @@ export default function App() {
           <p>Prices are indicative and may slightly differ from the live in-game trade market. :P</p>
         </footer>
       </div>
+
+      {priceError && (
+        <button
+          type="button"
+          onClick={() => setPriceError('')}
+          className="fixed bottom-6 left-1/2 z-50 w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 rounded-lg border border-red-400/50 bg-red-700 px-5 py-4 text-left font-medium text-white shadow-2xl transition-colors hover:bg-red-600"
+          aria-label={`${priceError} Click to dismiss.`}
+        >
+          {priceError}
+        </button>
+      )}
     </div>
   );
 }
